@@ -1,0 +1,32 @@
+{
+  "name": "csmt",
+  "version": "0.1.0",
+  "description": "Compact Space Merkle Tree.",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "tsc --inlineSourceMap",
+    "prepublishOnly": "yarn build",
+    "prettier": "prettier --write --single-quote './{src,test}/**/*.ts'",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "@types/node": "12.7.5"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.18",
+    "jest": "24.9.0",
+    "prettier": "1.18.2",
+    "ts-jest": "24.1.0",
+    "typescript": "3.6.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "verbose": false
+  },
+  "keywords": [
+    "merkle",
+    "tree"
+  ],
+  "author": "Olli Vanhoja",
+  "license": "ISC"
+}
