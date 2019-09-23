@@ -3,20 +3,36 @@ interface TreeNode {
 	key: bigint;
 	left: TreeNode | null;
 	right: TreeNode | null;
-};
+}
 
 type KeyHashPair = [bigint, Buffer];
 
 interface TreeDiff {
-	left: KeyHashPair[]
+	left: KeyHashPair[];
 	right: KeyHashPair[];
-};
+}
 
 interface Csmt {
+	/**
+	 * Get the root node.
+	 */
 	getRoot: () => TreeNode | null;
+
+	/**
+	 * Insert a new key-hash pair.
+	 */
 	insert: (k: bigint, h: Buffer) => void;
+
+	/**
+	 * Delete a key-hash pair from the tree.
+	 */
 	delete: (k: bigint) => void;
+
 	membershipProof: (k: bigint) => void;
+
+	/**
+	 * Compute the diff between this and a given tree.
+	 */
 	diff: (tree: Csmt) => TreeDiff;
 }
 
@@ -61,11 +77,15 @@ export function createTree(createHash: () => any): Csmt {
 			.digest();
 	}
 
-	function createNode(left: TreeNode | null, right: TreeNode | null): TreeNode {
+	function createNode(
+		left: TreeNode | null,
+		right: TreeNode | null
+	): TreeNode {
 		const hash =
 			left && right
 				? genNodeHash(left.hash, right.hash)
 				: genHash(Buffer.from(''));
+
 		return {
 			hash,
 			key: max(left, right),
@@ -83,6 +103,9 @@ export function createTree(createHash: () => any): Csmt {
 		};
 	}
 
+	/**
+	 * Update node properties.
+	 */
 	function updateNode(node: TreeNode) {
 		if (node.left || node.right) {
 			node.key = max(node.left, node.right);
@@ -91,7 +114,6 @@ export function createTree(createHash: () => any): Csmt {
 			}
 		}
 	}
-
 
 	function insert(node: TreeNode, newLeaf: TreeNode) {
 		const { key: k } = newLeaf;
@@ -144,12 +166,25 @@ export function createTree(createHash: () => any): Csmt {
 		console.log(k);
 	}
 
-	function diffAB(diffA: Map<bigint, Buffer>, diffB: Map<bigint, Buffer>, nodeA: TreeNode | null, nodeB: TreeNode | null) {
-		console.log(`visit: left ${nodeA && nodeA.key}, right ${nodeB && nodeB.key}`);
-		if ((nodeA && nodeB) && nodeA.key === nodeB.key && nodeA.hash.compare(nodeB.hash) === 0) {
+	function diffAB(
+		diffA: Map<bigint, Buffer>,
+		diffB: Map<bigint, Buffer>,
+		nodeA: TreeNode | null,
+		nodeB: TreeNode | null
+	) {
+		console.log(
+			`visit: left ${nodeA && nodeA.key}, right ${nodeB && nodeB.key}`
+		);
+		if (
+			nodeA &&
+			nodeB &&
+			nodeA.key === nodeB.key &&
+			nodeA.hash.compare(nodeB.hash) === 0
+		) {
 			return;
 		}
-		const nodeToString = (node: TreeNode | null) => node ? `[${node.key}, ${node.hash.toString('base64')}]` : '<null>';
+		const nodeToString = (node: TreeNode | null) =>
+			node ? `[${node.key}, ${node.hash.toString('base64')}]` : '<null>';
 		console.log('No hash match', nodeToString(nodeA), nodeToString(nodeB));
 
 		const leftA = nodeA && nodeA.left;
@@ -182,19 +217,21 @@ export function createTree(createHash: () => any): Csmt {
 		}
 
 		if (leftA || leftB) {
+			// Recurse to the left branch
 			diffAB(diffA, diffB, leftA, leftB);
 		}
 		if (rightA || rightB) {
+			// Recurese to the right branch
 			diffAB(diffA, diffB, rightA, rightB);
 		}
 	}
 
 	function diff(tree: Csmt) {
-		let nodeA = root;
-		let nodeB = tree.getRoot();
-
 		const leftMap = new Map<bigint, Buffer>();
 		const rightMap = new Map<bigint, Buffer>();
+		const nodeA = root;
+		const nodeB = tree.getRoot();
+
 		diffAB(leftMap, rightMap, nodeA, nodeB);
 
 		return {
