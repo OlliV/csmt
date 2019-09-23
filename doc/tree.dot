@@ -1,0 +1,19 @@
+graph ethane {
+	a [label="5"];
+	b [label="3"];
+	c [label="1" shape=box];
+	d [label="3"];
+	e [label="2" shape=box];
+	f [label="3" shape=box];
+	g [label="5"];
+	h [label="4" shape=box];
+	i [label="5" shape=box];
+	a -- b;
+	b -- c;
+	b -- d;
+	d -- e;
+	d -- f;
+	a -- g;
+	g -- h;
+	g -- i;
+}
