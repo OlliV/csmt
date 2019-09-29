@@ -1,5 +1,9 @@
 import { Csmt, TreeNode } from './index';
 
+function makeLabel(node: TreeNode) {
+	return `${node.key}\n${node.hash.toString('base64').substring(0, 5)}`
+}
+
 export default function draw(csmt: Csmt) {
 	const root = csmt.getRoot();
 	const lines: string[] = [];
@@ -12,7 +16,7 @@ export default function draw(csmt: Csmt) {
 		const right = node.right;
 		const isLeaf = !left && !right;
 
-		nodes.push(`n${cur} [label="${node.key}"${isLeaf ? ' shape=box' : ''}];`);
+		nodes.push(`n${cur} [label="${makeLabel(node)}"${isLeaf ? ' shape=box' : ''}];`);
 		if (cur > 0) {
 			lines.push(`n${prev} -- n${cur}`);
 		}

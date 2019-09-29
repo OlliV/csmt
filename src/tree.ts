@@ -136,9 +136,6 @@ export function createTree(createHash: () => any): Csmt {
 		nodeA: TreeNode | null,
 		nodeB: TreeNode | null
 	) {
-		console.log(
-			`visit: left ${nodeA && nodeA.key}, right ${nodeB && nodeB.key}`
-		);
 		if (
 			nodeA &&
 			nodeB &&
@@ -147,9 +144,7 @@ export function createTree(createHash: () => any): Csmt {
 		) {
 			return;
 		}
-		const nodeToString = (node: TreeNode | null) =>
-			node ? `[${node.key}, ${node.hash.toString('base64')}]` : '<null>';
-		console.log('No hash match', nodeToString(nodeA), nodeToString(nodeB));
+		// No hash match
 
 		const leftA = nodeA && nodeA.left;
 		const leftB = nodeB && nodeB.left;
