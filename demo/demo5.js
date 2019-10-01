@@ -6,13 +6,15 @@ const treeify = require('./lib/treeify');
 const tree = createTree(() => createHash('sha256'));
 
 tree.insert(1n, Buffer.from('a'));
-console.log(treeify.asTree(tree.getRoot(), true));
-
 tree.insert(4n, Buffer.from('b'));
-console.log(treeify.asTree(tree.getRoot(), true));
+tree.insert(3n, Buffer.from('c'));
+tree.insert(5n, Buffer.from('d'));
 
-tree.insert(3n, Buffer.from('b'));
 console.log(treeify.asTree(tree.getRoot(), true));
+console.log(tree.membershipProof(3n).map((n) => {
+		const a = n[0] instanceof Buffer ? n[0].toString('base64') : n[0];
+		const b = n[1] instanceof Buffer ? n[1].toString('base64') : n[1];
 
-tree.insert(5n, Buffer.from('b'));
-console.log(treeify.asTree(tree.getRoot(), true));
+		return [a, b];
+	})
+);

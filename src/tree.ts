@@ -1,29 +1,10 @@
 import { Csmt, TreeNode, TreeDiff } from './types';
-
-function distance(x: bigint, y: bigint): bigint {
-	let v = x ^ y;
-	let r = 0n;
-
-	while ((v >>= 1n)) {
-		r++;
-	}
-
-	return r;
-}
-
-function min(x: TreeNode | null, y: TreeNode | null) {
-	const a = (x && x.key) || 0n;
-	const b = (y && y.key) || 0n;
-
-	return a < b ? a : b;
-}
-
-function max(x: TreeNode | null, y: TreeNode | null) {
-	const a = (x && x.key) || 0n;
-	const b = (y && y.key) || 0n;
-
-	return a > b ? a : b;
-}
+import {
+	distance,
+	min,
+	max
+} from './tree-utils';
+import membershipProof from './memebership-proof';
 
 export function createTree(createHash: () => any): Csmt {
 	let root: TreeNode | null = null;
@@ -199,11 +180,6 @@ export function createTree(createHash: () => any): Csmt {
 		};
 	}
 
-	function membershipProof(k: bigint) {
-		// TODO
-		console.log(k);
-	}
-
 	return {
 		getRoot: () => root,
 		insert: (k: bigint, h: Buffer) => {
@@ -221,7 +197,7 @@ export function createTree(createHash: () => any): Csmt {
 		},
 		delete: deleteNode,
 		diff,
-		membershipProof
+		membershipProof: (k: bigint) => membershipProof(root, k)
 	};
 }
 
