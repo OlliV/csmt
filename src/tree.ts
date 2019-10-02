@@ -1,9 +1,5 @@
 import { Csmt, TreeNode, TreeDiff } from './types';
-import {
-	distance,
-	min,
-	max
-} from './tree-utils';
+import { distance, min, max } from './tree-utils';
 import membershipProof from './memebership-proof';
 
 export function createTree(createHash: () => any): Csmt {
@@ -200,4 +196,3 @@ export function createTree(createHash: () => any): Csmt {
 		membershipProof: (k: bigint) => membershipProof(root, k)
 	};
 }
-

@@ -1,7 +1,7 @@
 import { Csmt, TreeNode } from './index';
 
 function makeLabel(node: TreeNode) {
-	return `${node.key}\n${node.hash.toString('base64').substring(0, 5)}`
+	return `${node.key}\n${node.hash.toString('base64').substring(0, 5)}`;
 }
 
 export default function draw(csmt: Csmt) {
@@ -16,7 +16,9 @@ export default function draw(csmt: Csmt) {
 		const right = node.right;
 		const isLeaf = !left && !right;
 
-		nodes.push(`n${cur} [label="${makeLabel(node)}"${isLeaf ? ' shape=box' : ''}];`);
+		nodes.push(
+			`n${cur} [label="${makeLabel(node)}"${isLeaf ? ' shape=box' : ''}];`
+		);
 		if (cur > 0) {
 			lines.push(`n${prev} -- n${cur}`);
 		}
@@ -30,11 +32,11 @@ export default function draw(csmt: Csmt) {
 			i++;
 			walk(right, cur);
 		}
-	}
+	};
 
 	if (root) {
 		walk(root, i);
 	}
 
-	return `graph ethane {\n${nodes.join('\n')}\n${lines.join('\n')}\n}`
+	return `graph ethane {\n${nodes.join('\n')}\n${lines.join('\n')}\n}`;
 }
