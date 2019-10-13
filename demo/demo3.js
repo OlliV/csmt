@@ -1,4 +1,5 @@
 require('source-map-support').install();
+const chalk = require('chalk');
 const { createHash } = require('crypto');
 const { createTree, drawDot } = require('../lib/index');
 
@@ -17,6 +18,11 @@ tree2.insert(5n, Buffer.from('b'));
 tree2.insert(2n, Buffer.from('b')); // a new node
 //tree2.insert(7n, Buffer.from('b'));
 
-console.log(`Tree1:\n${drawDot(tree1)}`);
-console.log(`Tree2\n${drawDot(tree2)}`);
-console.log('Diff between the trees:\n', tree1.diff(tree2));
+console.error(chalk.red('Tree1:'));
+console.log(drawDot(tree1));
+
+console.error(chalk.red('\nTree2'));
+console.log(drawDot(tree2));
+
+console.error(chalk.red('\nDiff between the trees:'));
+console.log(tree1.diff(tree2));
