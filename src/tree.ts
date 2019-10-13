@@ -47,7 +47,7 @@ export function createTree(createHash: () => any): Csmt {
 	/**
 	 * Update node properties.
 	 */
-	function updateNode(node: TreeNode) {
+	function updateNode(node: TreeNode): void {
 		if (node.left || node.right) {
 			node.key = max(node.left, node.right);
 			if (node.left && node.right) {
@@ -102,9 +102,44 @@ export function createTree(createHash: () => any): Csmt {
 		return node;
 	}
 
-	function deleteNode(k: bigint) {
-		// TODO
-		console.log(k);
+	function checkForLeaf(node: TreeNode, k: bigint) {
+		return !node.left && !node.right && node.key === k;
+	}
+
+	function deleteNode(node: TreeNode, k: bigint): TreeNode {
+		const left = node.left;
+		const right = node.right;
+
+		if (!left || !right) {
+			throw new Error('The tree is broken');
+		}
+
+		if (checkForLeaf(left, k) || checkForLeaf(right, k)) {
+			if (left.key === k) {
+				// The `left` node is discarded
+				return right;
+			} else {
+				// The `right` node is discarded
+				return left;
+			}
+		} else {
+			const lDist = distance(k, left.key);
+			const rDist = distance(k, right.key);
+
+			if (lDist < rDist) {
+				node.left = deleteNode(left, k);
+				updateNode(node);
+
+				return node;
+			} else if (lDist > rDist) {
+				node.right = deleteNode(right, k);
+				updateNode(node);
+
+				return node;
+			} else {
+				throw new Error(`k=${k} does not exist`);
+			}
+		}
 	}
 
 	function diffAB(
@@ -191,7 +226,13 @@ export function createTree(createHash: () => any): Csmt {
 				root = newLeaf;
 			}
 		},
-		delete: deleteNode,
+		delete: (k: bigint) => {
+			if (!root) {
+				throw new Error('The tree is empty');
+			}
+
+			root = deleteNode(root, k);
+		},
 		diff,
 		membershipProof: (k: bigint) => membershipProof(root, k)
 	};
