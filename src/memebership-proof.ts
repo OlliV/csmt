@@ -1,5 +1,5 @@
 import { TreeNode } from './types';
-import { distance, minInSubtree, maxInSubtree } from './tree-utils';
+import { minInSubtree, maxInSubtree } from './tree-utils';
 import match from './match';
 
 export enum Direction {
@@ -49,14 +49,9 @@ function nonMembershipProof(
 function membershipProofR(
 	sibling: TreeNode | null,
 	direction: Direction | null,
-	node: TreeNode | null,
+	node: TreeNode,
 	k: bigint
 ): Proof {
-	if (!node) {
-		// TODO Is this right???
-		return [];
-	}
-
 	const left = node.left;
 	const right = node.right;
 
@@ -79,14 +74,11 @@ function membershipProofR(
 		}
 	}
 
-	const lDist = distance(k, left.key);
-	const rDist = distance(k, right.key);
-
 	let result;
-	if (lDist < rDist) {
+	if (k <= left.key) {
 		// Going towards left child
 		result = membershipProofR(right, Direction.Left, left, k);
-	} else if (lDist > rDist) {
+	} else if (k <= right.key) {
 		// Going towards right child
 		result = membershipProofR(left, Direction.Right, right, k);
 	} else {
@@ -102,10 +94,9 @@ function membershipProofR(
 		return nonMembershipProof(k, node.key, direction, sibling);
 	}
 
-	// sibling should be always set if we endup here but TS can't determine that
 	if (sibling) {
 		if (isList(result) && direction) {
-			// @ts-ignore the array thing is confusing to TS
+			// @ts-ignore the array thing is confusing for TS
 			return [[sibling.hash, reverse(direction)], ...result];
 		} else if (result[1] === null && direction === Direction.Left) {
 			return [node.key, minInSubtree(sibling)];
@@ -121,13 +112,16 @@ export default function membershipProof(
 	root: TreeNode | null,
 	k: bigint
 ): Proof {
+	if (!root) {
+		return [];
+	}
+
 	// Root has no sibling or direction so null is used
 	return (
 		match(membershipProofR(null, null, root, k))
 			// The key is present in the tree
 			// Provide the proof in reverse order
-			//  TODO /\
-			.on(x => isList(x), r => r)
+			.on(x => isList(x), r => r.reverse())
 			// The key is greater than the largest element in the tree
 			// Provide a proof for the largest key
 			.on(
