@@ -55,6 +55,10 @@ function membershipProofR(
 	const left = node.left;
 	const right = node.right;
 
+	if (k === undefined || k === null) {
+		throw new TypeError('k is not a bigint');
+	}
+
 	// && would be more accurate here but there is never a case where only one
 	// would be set and thus this way we save on error handling later on.
 	if (!left || !right) {
@@ -82,9 +86,14 @@ function membershipProofR(
 		// Going towards right child
 		result = membershipProofR(left, Direction.Right, right, k);
 	} else {
+		if (k > right.key) {
+			// The given key `k` is greater than any key in this tree.
+			return [];
+		}
+
 		if (!direction) {
 			// TODO How should we set direction?
-			throw new TypeError('"Direction" should be set');
+			throw new TypeError('"Direction" must be set');
 		}
 		if (!sibling) {
 			throw new Error('"sibling" must be set');
@@ -119,6 +128,8 @@ export default function membershipProof(
 	// Root has no sibling or direction so null is used
 	return (
 		match(membershipProofR(null, null, root, k))
+			// Out of bounds
+			.on(x => x.length === 0, () => [])
 			// The key is present in the tree
 			// Provide the proof in reverse order
 			.on(x => isList(x), r => r.reverse())

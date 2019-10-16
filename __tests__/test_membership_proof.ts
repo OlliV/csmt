@@ -60,4 +60,30 @@ describe('Membership proofs', () => {
 		expect(root).not.toBeNull();
 		expect(rootHash).toEqual(root && root.hash);
 	});
+
+	test('Fail to show a proof for a key that is greater than the max key in the tree', () => {
+		const tree = createTree(() => createHash('sha256'));
+
+		tree.insert(1n, Buffer.from('a'));
+		tree.insert(3n, Buffer.from('b'));
+		tree.insert(4n, Buffer.from('c'));
+		tree.insert(5n, Buffer.from('d'));
+
+		const proof = tree.membershipProof(6n);
+
+		expect(proof).toHaveLength(0);
+	});
+
+	test('Fail to show a proof for a key that is greater than the max key in the tree (case 2)', () => {
+		const tree = createTree(() => createHash('sha256'));
+
+		tree.insert(1n, Buffer.from('a'));
+		tree.insert(3n, Buffer.from('b'));
+		tree.insert(4n, Buffer.from('c'));
+		tree.insert(5n, Buffer.from('d'));
+
+		const proof = tree.membershipProof(10n);
+
+		expect(proof).toHaveLength(0);
+	});
 });
