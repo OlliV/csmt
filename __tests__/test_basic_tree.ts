@@ -20,7 +20,7 @@ describe('Basic tree building functionality', () => {
 		const root = tree.getRoot();
 		expect(root).not.toBeNull();
 		expect(root.hash).toBeInstanceOf(Buffer);
-		expect(shortHash(root.hash)).toEqual('jq/kE');
+		expect(shortHash(root.hash)).toBe('jq/kE');
 		expect(root.key).toBe(4n);
 
 		expect(root.left).not.toBeNull();
@@ -54,5 +54,33 @@ describe('Basic tree building functionality', () => {
 		expect(root.right.key).toBe(4n);
 		expect(root.right.left).toBeNull();
 		expect(root.right.right).toBeNull();
+	});
+
+	test('The root hash is recomputed on every insert', () => {
+		tree.insert(1n, Buffer.from('a'));
+		expect(shortHash(tree.getRoot().hash)).toBe('YQ==');
+
+		tree.insert(2n, Buffer.from('b'));
+		expect(shortHash(tree.getRoot().hash)).toBe('+44g/');
+
+		tree.insert(5n, Buffer.from('c'));
+		expect(shortHash(tree.getRoot().hash)).toBe('OvuAS');
+	});
+
+	test('Trees are reproducible regardless of the insertion order', () => {
+		const tree1 = createTree(() => createHash('sha256'));
+		const tree2 = createTree(() => createHash('sha256'));
+
+		tree1.insert(1n, Buffer.from('a'));
+		tree1.insert(2n, Buffer.from('b'));
+		tree1.insert(3n, Buffer.from('c'));
+		tree1.insert(4n, Buffer.from('d'));
+
+		tree2.insert(2n, Buffer.from('b'));
+		tree2.insert(4n, Buffer.from('d'));
+		tree2.insert(3n, Buffer.from('c'));
+		tree2.insert(1n, Buffer.from('a'));
+
+		expect(tree1.getRoot()).toEqual(tree2.getRoot());
 	});
 });
