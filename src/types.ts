@@ -1,3 +1,5 @@
+import {Proof} from './memebership-proof';
+
 export interface TreeNode {
 	hash: Buffer;
 	key: bigint;
@@ -28,7 +30,11 @@ export interface Csmt {
 	 */
 	delete: (k: bigint) => void;
 
-	membershipProof: (k: bigint) => void;
+	/**
+	 * Provide a proof of membership if a key exist in the three;
+	 * Otherwise a proof of non-membership is returned.
+	 */
+	membershipProof: (k: bigint) => Proof;
 
 	/**
 	 * Compute the diff between this and a given tree.

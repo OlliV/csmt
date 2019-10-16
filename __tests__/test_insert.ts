@@ -1,10 +1,10 @@
 // @ts-nocheck
 import { createHash } from 'crypto';
-import {Csmt, createTree} from '../lib';
+import { Csmt, createTree } from '../lib';
 
 const shortHash = (buf: Buffer) => buf.toString('base64').substring(0, 5);
 
-describe('Basic tree building functionality', () => {
+describe('Basic tree building functionality with insert()', () => {
 	let tree: Csmt;
 
 	beforeEach(() => {
@@ -82,5 +82,22 @@ describe('Basic tree building functionality', () => {
 		tree2.insert(1n, Buffer.from('a'));
 
 		expect(tree1.getRoot()).toEqual(tree2.getRoot());
+	});
+
+	test('Difference in a single node causes the root hash to differ', () => {
+		const tree1 = createTree(() => createHash('sha256'));
+		const tree2 = createTree(() => createHash('sha256'));
+
+		tree1.insert(1n, Buffer.from('a'));
+		tree1.insert(2n, Buffer.from('b'));
+		tree1.insert(3n, Buffer.from('c'));
+		tree1.insert(4n, Buffer.from('d'));
+
+		tree2.insert(1n, Buffer.from('a'));
+		tree2.insert(2n, Buffer.from('b'));
+		tree2.insert(3n, Buffer.from('x'));
+		tree2.insert(4n, Buffer.from('d'));
+
+		expect(tree2.getRoot().hash).not.toBe(tree1.getRoot().hash);
 	});
 });
