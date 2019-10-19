@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createHash } from 'crypto';
 import { Csmt, createTree } from '../lib';
 
@@ -61,7 +62,7 @@ describe('Membership proofs', () => {
 		expect(rootHash).toEqual(root && root.hash);
 	});
 
-	test('Fail to show a proof for a key that is greater than the max key in the tree', () => {
+	test('Show a proof that 6n is greater than the greatest key in the tree (5n)', () => {
 		const tree = createTree(() => createHash('sha256'));
 
 		tree.insert(1n, Buffer.from('a'));
@@ -71,10 +72,26 @@ describe('Membership proofs', () => {
 
 		const proof = tree.membershipProof(6n);
 
-		expect(proof).toHaveLength(0);
+		expect(proof).toHaveLength(4);
+
+		const [ d, c, ab, miss ] = proof;
+
+		expect(d).toHaveLength(2);
+		expect(d[0]).toEqual(Buffer.from('d'));
+		expect(d[1]).toBe(5n);
+
+		expect(c).toHaveLength(2);
+		expect(c[0]).toEqual(Buffer.from('c'));
+		expect(c[1]).toBe('L');
+
+		expect(ab).toHaveLength(2);
+		expect(ab[0]).toEqual(genNodeHash(Buffer.from('a'), Buffer.from('b')));
+		expect(ab[1]).toBe('L');
+
+		expect(miss).toBeNull();
 	});
 
-	test('Fail to show a proof for a key that is greater than the max key in the tree (case 2)', () => {
+	test('Show a proof that 10n is greater than the greatest key in the tree (5n)', () => {
 		const tree = createTree(() => createHash('sha256'));
 
 		tree.insert(1n, Buffer.from('a'));
@@ -84,6 +101,43 @@ describe('Membership proofs', () => {
 
 		const proof = tree.membershipProof(10n);
 
-		expect(proof).toHaveLength(0);
+		expect(proof).toHaveLength(4);
+
+		const [ d, c, ab, miss ] = proof;
+
+		expect(d).toHaveLength(2);
+		expect(d[0]).toEqual(Buffer.from('d'));
+		expect(d[1]).toBe(5n);
+
+		expect(c).toHaveLength(2);
+		expect(c[0]).toEqual(Buffer.from('c'));
+		expect(c[1]).toBe('L');
+
+		expect(ab).toHaveLength(2);
+		expect(ab[0]).toEqual(genNodeHash(Buffer.from('a'), Buffer.from('b')));
+		expect(ab[1]).toBe('L');
+
+		expect(miss).toBeNull();
+	});
+
+	test('Show a proof that 1n is smaller than the smallest key in the tree (2n)', () => {
+		const tree = createTree(() => createHash('sha256'));
+
+		tree.insert(2n, Buffer.from('a'));
+		tree.insert(3n, Buffer.from('b'));
+		tree.insert(4n, Buffer.from('c'));
+		tree.insert(5n, Buffer.from('d'));
+
+		const proof = tree.membershipProof(1n);
+
+		expect(proof).toHaveLength(4);
+		const expectedProof = [
+			null,
+			[ Buffer.from('a'), 2n ],
+			[ Buffer.from('b'), 'R' ],
+			[ genNodeHash(Buffer.from('c'), Buffer.from('d')), 'R' ]
+		];
+
+		expect(proof).toEqual(expectedProof);
 	});
 });

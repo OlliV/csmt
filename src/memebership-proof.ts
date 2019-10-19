@@ -88,7 +88,8 @@ function membershipProofR(
 	} else {
 		if (k > right.key) {
 			// The given key `k` is greater than any key in this tree.
-			return [];
+			// Trigger a proof for the largest key
+			return [right.key, null];
 		}
 
 		if (!direction) {
@@ -128,8 +129,6 @@ export default function membershipProof(
 	// Root has no sibling or direction so null is used
 	return (
 		match(membershipProofR(null, null, root, k))
-			// Out of bounds
-			.on(x => x.length === 0, () => [])
 			// The key is present in the tree
 			// Provide the proof in reverse order
 			.on(x => isList(x), r => r.reverse())
@@ -137,13 +136,13 @@ export default function membershipProof(
 			// Provide a proof for the largest key
 			.on(
 				([_, y]) => y === null,
-				([x, _]) => [membershipProof(root, x), null]
+				([x, _]) => [...membershipProof(root, x), null]
 			)
 			// The key is smaller than the smallest element in the tree
 			// Provide a proof for the smallest key
 			.on(
 				([x, _]) => x === null,
-				([_, y]) => [null, membershipProof(root, y)]
+				([_, y]) => [null, ...membershipProof(root, y)]
 			)
 			// The key is bounded by by two keys in the case of non-membership proff
 			// provide a proof for the bounding keys to exist
