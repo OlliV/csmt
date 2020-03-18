@@ -1,4 +1,4 @@
-import {Proof} from './memebership-proof';
+import { Proof } from './memebership-proof';
 
 export interface TreeNode {
 	hash: Buffer;

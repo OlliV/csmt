@@ -1,6 +1,6 @@
 import { Csmt, TreeNode, TreeDiff } from './types';
 import { distance, min, max } from './tree-utils';
-import membershipProof, {Proof} from './memebership-proof';
+import membershipProof, { Proof } from './memebership-proof';
 
 export function createTree(createHash: () => any): Csmt {
 	let root: TreeNode | null = null;

@@ -71,7 +71,10 @@ function membershipProofR(
 
 		// This is a leaf node
 		if (node.key === k) {
-			return [[sibling.hash, reverse(direction)], [node.hash, node.key]];
+			return [
+				[sibling.hash, reverse(direction)],
+				[node.hash, node.key]
+			];
 		} else {
 			// Find the non-membership proof otherwise
 			return nonMembershipProof(k, node.key, direction, sibling);
@@ -131,7 +134,10 @@ export default function membershipProof(
 		match(membershipProofR(null, null, root, k))
 			// The key is present in the tree
 			// Provide the proof in reverse order
-			.on(x => isList(x), r => r.reverse())
+			.on(
+				x => isList(x),
+				r => r.reverse()
+			)
 			// The key is greater than the largest element in the tree
 			// Provide a proof for the largest key
 			.on(
